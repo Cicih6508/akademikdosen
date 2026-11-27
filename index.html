@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JAD — Portal Jabatan Akademik Dosen | Universitas Pancasakti Tegal</title>
+  <meta name="description" content="Panduan interaktif jabatan akademik dosen: simulasi poin publikasi, kalkulator kesiapan & batas usia pensiun (BUP), kalender kegiatan, serta ekspor laporan PDF/Word." />
+  <meta name="theme-color" content="#2f6fb8" />
+  <link rel="icon" href="assets/img/logo.png?v=2" type="image/png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="assets/css/style.css?v=4" />
+</head>
+<body class="is-locked">
+  <a class="skip-link" href="#konten">Langsung ke konten</a>
+
+  <!-- ============ PORTAL LOGIN ============ -->
+  <div class="gate" id="gate">
+    <div class="gate-bg" aria-hidden="true"></div>
+    <div class="gate-orb gate-orb-1" aria-hidden="true"></div>
+    <div class="gate-orb gate-orb-2" aria-hidden="true"></div>
+
+    <form class="gate-card glass" id="loginForm" autocomplete="off" novalidate>
+      <img class="brand-mark gate-mark" src="assets/img/logo.png" alt="Logo JAD" />
+      <span class="gate-kicker">Universitas Pancasakti Tegal</span>
+      <h1 class="gate-title">Portal JAD</h1>
+      <p class="gate-sub">Masuk untuk mengakses panduan &amp; kalkulator jabatan akademik dosen.</p>
+
+      <div class="field-glass">
+        <label for="loginUser">Nama pengguna</label>
+        <input type="text" id="loginUser" placeholder="Masukkan nama pengguna" autocomplete="username" />
+      </div>
+      <div class="field-glass">
+        <label for="loginPass">Kata sandi</label>
+        <div class="pass-wrap">
+          <input type="password" id="loginPass" placeholder="Masukkan kata sandi" autocomplete="current-password" />
+          <button type="button" class="pass-toggle" id="passToggle" aria-label="Tampilkan kata sandi">Lihat</button>
+        </div>
+      </div>
+      <p class="login-error" id="loginError" role="alert" hidden>Nama pengguna atau kata sandi salah.</p>
+      <button type="submit" class="btn btn-primary btn-block">Masuk ke Portal</button>
+      <p class="gate-foot">Akses dosen &amp; tim PAK • Acuan Permendiktisaintek 52/2025</p>
+    </form>
+  </div>
+
+  <!-- ============ LAYAR LOADING ============ -->
+  <div class="loader" id="loader" hidden aria-live="polite">
+    <div class="loader-bg" aria-hidden="true"></div>
+    <div class="loader-box glass">
+      <div class="loader-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <p class="loader-title">Menyiapkan portal JAD</p>
+      <p class="loader-text" id="loaderText">Memuat data regulasi…</p>
+      <div class="loader-track"><span id="loaderBar"></span></div>
+      <p class="loader-pct"><span id="loaderPct">0</span>%</p>
+    </div>
+  </div>
+
+  <!-- ============ APLIKASI ============ -->
+  <div id="app" hidden>
+    <header class="site-header" id="atas">
+      <div class="topbar">
+        <div class="container topbar-in">
+          <span>Universitas Pancasakti Tegal • Portal Perencanaan Karier Dosen</span>
+          <span class="topbar-user">Masuk sebagai <strong>admin</strong> · <button type="button" class="link-btn" id="btnLogout">Keluar</button></span>
+        </div>
+      </div>
+
+      <div class="container nav">
+        <a href="#beranda" class="brand" data-nav="beranda" aria-label="JAD, kembali ke beranda">
+          <img class="brand-mark" src="assets/img/logo.png" alt="Logo JAD" />
+          <span class="brand-text">
+            <strong>JAD</strong>
+            <small>Jabatan Akademik Dosen</small>
+          </span>
+        </a>
+
+        <div class="nav-right">
+          <span class="nav-export-label">Ekspor Dossier</span>
+          <button type="button" class="btn btn-primary btn-sm" id="btnExportPdfNav" title="Cetak atau simpan sebagai PDF">PDF</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btnExportWordNav" title="Unduh dokumen Microsoft Word (.doc)">Word</button>
+          <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Buka menu">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="navbar">
+        <nav class="container nav-links" id="menu" aria-label="Navigasi utama">
+          <a href="#beranda" class="is-active" data-nav="beranda">Beranda</a>
+          <a href="#jenjang" data-nav="jenjang">Jenjang</a>
+          <a href="#angka-kredit" data-nav="angka-kredit">Angka kredit</a>
+          <a href="#kalkulator" data-nav="kalkulator">Layanan Akademik</a>
+          <a href="#alur" data-nav="alur">Alur</a>
+          <a href="#loncat" data-nav="loncat">Loncat jabatan</a>
+          <a href="#kalender" data-nav="kalender">Kalender</a>
+          <a href="#faq" data-nav="faq">FAQ</a>
+          <a href="#bantuan" class="nav-help" id="navHelp">Bantuan</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="konten">
+
+      <!-- ============ 1. BERANDA ============ -->
+      <section class="hero view is-in" id="beranda" aria-labelledby="hero-title">
+        <div class="hero-banner">
+          <div class="hero-glow hero-glow-1" aria-hidden="true"></div>
+          <div class="hero-glow hero-glow-2" aria-hidden="true"></div>
+
+          <div class="hero-glass glass">
+            <span class="eyebrow-glass">PERMEN 52/2025 &amp; KEPMEN 39/M/KEP/2026</span>
+            <h1 id="hero-title">Di anak tangga mana karier akademik Anda sekarang?</h1>
+            <p class="lede">
+              Geser penanda pada penggaris angka kredit untuk melihat posisi Anda, jenjang berikutnya,
+              dan perkiraan waktu untuk sampai ke sana.
+            </p>
+            <div class="hero-cta">
+              <a class="btn btn-glass-solid" href="#hitung" data-nav="hitung">Hitung kesiapan &amp; BUP</a>
+              <a class="btn btn-glass" href="#poin" data-nav="poin">Simulasi poin publikasi</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="container ruler-wrap">
+          <div class="ruler-card card">
+            <header class="card-head">
+              <h2>Penggaris Angka Kredit</h2>
+              <p>Angka di penggaris adalah AK kumulatif tiap tingkat jabatan. Perkiraan waktu memakai koefisien jenjang pada rentang itu.</p>
+            </header>
+
+            <aside class="readout" aria-live="polite" aria-labelledby="readout-label">
+              <div class="readout-main">
+                <p class="readout-label" id="readout-label">Angka kredit kumulatif</p>
+                <p class="readout-value"><span id="rdValue">0</span><small>AK</small></p>
+                <p class="readout-status" id="rdStatus">Geser penanda untuk mulai.</p>
+              </div>
+              <dl class="readout-list">
+                <div><dt>Berikutnya</dt><dd id="rdNext">–</dd></div>
+                <div><dt>Masih kurang</dt><dd id="rdGap">–</dd></div>
+                <div><dt>Perkiraan waktu</dt><dd id="rdTime">–</dd></div>
+              </dl>
+            </aside>
+
+            <div class="ruler-scroll">
+              <div class="ruler" id="ruler">
+                <div class="ruler-bands" id="rulerBands" aria-hidden="true"></div>
+                <div class="ruler-track" aria-hidden="true">
+                  <div class="ruler-marker" id="rulerMarker"></div>
+                  <div class="ruler-ticks" id="rulerTicks"></div>
+                </div>
+                <div class="ruler-input-wrap">
+                  <label class="sr-only" for="akRange">Angka kredit kumulatif</label>
+                  <input type="range" id="akRange" min="0" max="1100" step="5" value="0" />
+                  <span class="ruler-needle" id="rulerNeedle" aria-hidden="true"></span>
+                  <output class="ruler-bubble" id="rulerBubble" for="akRange">0</output>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 2. JENJANG ============ -->
+      <section class="section view" id="jenjang" aria-labelledby="jenjang-title" hidden>
+        <div class="container">
+          <header class="section-head">
+            <h2 id="jenjang-title">Empat jenjang, satu tangga</h2>
+            <p>
+              Tinggi tiap anak tangga sebanding dengan angka kredit tertinggi pada jenjang itu.
+              Pilih satu jenjang untuk membaca syarat kenaikan menuju jenjang tersebut.
+            </p>
+          </header>
+
+          <div class="stairs" role="tablist" aria-label="Pilih jenjang jabatan akademik" id="stairs"></div>
+          <article class="detail card" id="detail" role="tabpanel" tabindex="0" aria-live="polite"></article>
+        </div>
+      </section>
+
+      <!-- ============ 3. ANGKA KREDIT ============ -->
+      <section class="section view" id="angka-kredit" aria-labelledby="ak-title" hidden>
+        <div class="container">
+          <header class="section-head">
+            <h2 id="ak-title">Dari mana angka kredit datang</h2>
+            <p>
+              Sejak Kepmendiktisaintek 39/M/KEP/2026, seluruh angka kredit dihimpun sebagai
+              <em>AK Kumulatif</em> yang tersusun dari empat komponen.
+            </p>
+          </header>
+
+          <div class="ak-grid">
+            <dl class="komponen" id="komponen"></dl>
+
+            <div class="ak-table-wrap">
+              <h3>Perolehan AK per tahun</h3>
+              <div class="table-scroll">
+                <table class="ak-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Jabatan</th>
+                      <th scope="col">SKP Baik</th>
+                      <th scope="col">SKP Sangat Baik</th>
+                      <th scope="col">Maks. AK per tahun</th>
+                    </tr>
+                  </thead>
+                  <tbody id="akTableBody"></tbody>
+                </table>
+              </div>
+              <p class="small-note">AK Konversi dari SKP ditambah AK Prestasi, dibatasi oleh kolom terakhir.</p>
+
+              <h3 class="mt">Proporsi AK penelitian</h3>
+              <p class="small-note">Dihitung dari selisih AK jenjang tujuan dan AK jabatan terakhir.</p>
+              <div class="proporsi" id="proporsi"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 4. LAYANAN AKADEMIK ============ -->
+      <section class="section view" id="kalkulator" aria-labelledby="gabung-title" hidden>
+        <div class="container">
+          <header class="section-head">
+            <h2 id="gabung-title">Layanan Akademik</h2>
+            <p>Pilih layanan di bawah ini, semuanya terhubung dalam satu halaman.</p>
+            <div class="svc-tabs" id="svcTabs" role="tablist" aria-label="Fitur layanan akademik">
+              <button type="button" class="chip-btn svc-tab is-active" role="tab" aria-selected="true" data-nav="hitung">Kalkulator</button>
+              <button type="button" class="chip-btn svc-tab" role="tab" aria-selected="false" data-nav="berkas">Publikasi &amp; Berkas</button>
+              <button type="button" class="chip-btn svc-tab" role="tab" aria-selected="false" data-nav="poin">Poin Publikasi</button>
+              <button type="button" class="chip-btn svc-tab" role="tab" aria-selected="false" data-nav="validator">Validator Jurnal</button>
+            </div>
+          </header>
+
+          <!-- Panel: KALKULATOR & BUP -->
+          <div class="sub-block svc-panel" id="hitung" role="tabpanel" aria-label="Kalkulator">
+            <header class="section-head sub-head">
+              <p>
+                Simulasikan kesiapan kenaikan reguler maupun loncat jabatan, lengkap dengan perhitungan tanggal pensiun dan tenggat pengusulan 2026.
+              </p>
+            </header>
+
+            <div class="calc">
+              <form class="calc-form" id="calcForm" novalidate>
+                <fieldset>
+                  <legend>Identitas &amp; Posisi Saat Ini</legend>
+                  <div class="field">
+                    <label for="fNamaDosen">Nama Dosen (untuk laporan cetak)</label>
+                    <input type="text" id="fNamaDosen" placeholder="Contoh: Dr. Budi Santoso, M.Kom." />
+                  </div>
+                  <div class="field">
+                    <label for="fTglLahir">Tanggal Lahir (untuk hitung BUP)</label>
+                    <input type="date" id="fTglLahir" value="1982-05-14" />
+                  </div>
+                  <div class="field">
+                    <label for="fJabatan">Jabatan akademik saat ini</label>
+                    <select id="fJabatan"></select>
+                  </div>
+                  <div class="field">
+                    <label for="fAkSk">AK pada SK jabatan terakhir</label>
+                    <select id="fAkSk"></select>
+                  </div>
+                  <div class="field">
+                    <label for="fAkNow">AK kumulatif saat ini</label>
+                    <input type="number" id="fAkNow" min="0" max="2000" step="0.25" inputmode="decimal" />
+                  </div>
+                  <div class="field">
+                    <label for="fLama">Lama di jabatan saat ini (tahun)</label>
+                    <input type="number" id="fLama" min="0" max="40" step="0.5" inputmode="decimal" />
+                  </div>
+                </fieldset>
+
+                <fieldset>
+                  <legend>Target Kenaikan &amp; Kinerja</legend>
+                  <div class="field">
+                    <label for="fTarget">Jenjang dan AK tujuan (Reguler / Loncat)</label>
+                    <select id="fTarget"></select>
+                  </div>
+                  <div class="field">
+                    <label for="fAkRiset">AK penelitian belum terpakai</label>
+                    <input type="number" id="fAkRiset" min="0" max="2000" step="0.25" inputmode="decimal" />
+                  </div>
+                  <div class="field">
+                    <label for="fSkp">Predikat SKP 2 tahun terakhir</label>
+                    <select id="fSkp">
+                      <option value="sb">Sangat Baik</option>
+                      <option value="b" selected>Baik</option>
+                      <option value="kurang">Di bawah Baik</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="fMasa">Total masa kerja dosen tetap (tahun)</label>
+                    <input type="number" id="fMasa" min="0" max="50" step="1" inputmode="numeric" />
+                  </div>
+                </fieldset>
+
+                <fieldset class="checks">
+                  <legend>Syarat Administrasi &amp; Kompetensi</legend>
+                  <label class="check"><input type="checkbox" id="fBkd" /> <span>BKD memenuhi 4 semester berturut-turut</span></label>
+                  <label class="check"><input type="checkbox" id="fPub" /> <span>Publikasi syarat khusus jenjang tujuan terpenuhi</span></label>
+                  <label class="check"><input type="checkbox" id="fUji" /> <span>Lulus uji kompetensi jabatan akademik</span></label>
+                  <div class="prof-only" id="profOnly" hidden>
+                    <label class="check"><input type="checkbox" id="fDoktor" /> <span>Berijazah doktor (S3), doktor terapan, atau subspesialis</span></label>
+                    <label class="check"><input type="checkbox" id="fSerdos" /> <span>Memiliki sertifikat pendidik (Serdos)</span></label>
+                  </div>
+                </fieldset>
+
+                <button type="button" class="btn btn-ghost" id="calcReset">Atur ulang isian</button>
+              </form>
+
+              <div class="calc-right-col">
+                <aside class="calc-result card" id="calcResult" aria-live="polite">
+                  <p class="result-kicker" id="resKicker">Lektor menuju Lektor Kepala 400</p>
+                  <h3 class="result-title" id="resTitle">Belum siap diusulkan</h3>
+                  <p class="result-sub" id="resSub"></p>
+
+                  <div class="meter">
+                    <div class="meter-head"><span>AK kumulatif</span><span id="mAkLabel">0 / 0</span></div>
+                    <div class="meter-bar"><span id="mAk"></span></div>
+                  </div>
+                  <div class="meter">
+                    <div class="meter-head"><span>AK penelitian</span><span id="mRisetLabel">0 / 0</span></div>
+                    <div class="meter-bar meter-riset"><span id="mRiset"></span></div>
+                  </div>
+
+                  <ul class="result-list" id="resList"></ul>
+                  <div class="result-time" id="resTime"></div>
+                </aside>
+
+                <aside class="bup-card card" id="bupCard" aria-live="polite">
+                  <div class="bup-head">
+                    <span class="eyebrow-tag">ANALISIS BATAS USIA PENSIUN (BUP)</span>
+                    <span class="bup-badge" id="bupStatusBadge">AMAN</span>
+                  </div>
+                  <h3>Proyeksi Masa Bakti &amp; Tenggat 2026</h3>
+                  <dl class="bup-grid" id="bupDetails"></dl>
+                  <button type="button" class="btn btn-accent btn-sm bup-cal-btn" id="btnSendBupToCal">
+                    + Simpan Tenggat Usulan ke Kalender
+                  </button>
+                </aside>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel: PUBLIKASI & BERKAS -->
+          <div class="sub-block svc-panel berkas-wrap" id="berkas" role="tabpanel" aria-label="Publikasi dan berkas" hidden>
+            <header class="section-head sub-head">
+              <p>
+                Centang berkas yang sudah Anda siapkan. Tanda centang tersimpan otomatis dan ikut tercetak saat ekspor PDF/Word.
+              </p>
+              <div class="berkas-progress">
+                <div class="ring" id="berkasRing" style="--p:0">
+                  <span id="berkasCount">0/10</span>
+                </div>
+                <p id="berkasText">Belum ada berkas yang dicentang.</p>
+              </div>
+              <button type="button" class="btn btn-ghost btn-sm" id="berkasReset">Kosongkan centang</button>
+            </header>
+
+            <ul class="berkas-list" id="berkasList"></ul>
+
+            <div class="export-panel card" id="exportPanel">
+              <h3>Unduh hasil</h3>
+              <p class="small-note">
+                Dokumen berisi rekap AK &amp; BUP, evaluasi syarat, daftar karya publikasi, dan daftar periksa berkas di atas.
+                <span id="exportKalNote"></span>
+              </p>
+              <div class="export-panel-actions">
+                <button type="button" class="btn btn-primary" id="btnExportPdfBerkas">Cetak / Simpan PDF</button>
+                <button type="button" class="btn btn-ghost" id="btnExportWordBerkas">Unduh Word (.doc)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel: POINT PUBLIKASI -->
+          <div class="sub-block svc-panel" id="poin" role="tabpanel" aria-label="Point publikasi" hidden>
+            <p class="svc-intro">Hitung perolehan AK Prestasi berdasarkan jenis luaran, peran kepenulisan, dan jumlah penulis. Hasilnya dapat langsung dikirim ke Kalkulator.</p>
+            <div class="pub-layout">
+              <form class="pub-form card" id="pubForm">
+                <h3>Tambah Luaran Karya Ilmiah</h3>
+                <div class="field">
+                  <label for="pJudul">Judul Artikel / Buku / Paten</label>
+                  <input type="text" id="pJudul" placeholder="Contoh: Analisis Model Pembelajaran OBE..." required />
+                </div>
+                <div class="field">
+                  <label for="pJenis">Kategori &amp; Pagu AK Maksimal</label>
+                  <select id="pJenis">
+                    <option value="40|Jurnal Internasional Bereputasi (Q1/Q2, IF > 0,05)">Jurnal Internasional Bereputasi Q1/Q2 (Maks. 40 AK)</option>
+                    <option value="30|Jurnal Internasional Bereputasi (Q3/Q4)">Jurnal Internasional Bereputasi Q3/Q4 (Maks. 30 AK)</option>
+                    <option value="25|Jurnal Nasional Terakreditasi SINTA 1 / 2">Jurnal Nasional SINTA 1 atau 2 (Maks. 25 AK)</option>
+                    <option value="20|Jurnal Nasional Terakreditasi SINTA 3 / 4">Jurnal Nasional SINTA 3 atau 4 (Maks. 20 AK)</option>
+                    <option value="15|Jurnal Nasional Terakreditasi SINTA 5 / 6">Jurnal Nasional SINTA 5 atau 6 (Maks. 15 AK)</option>
+                    <option value="40|Buku Referensi (Ber-ISBN, Terbitan Resmi)">Buku Referensi (Maks. 40 AK)</option>
+                    <option value="20|Buku Monograf (Ber-ISBN)">Buku Monograf (Maks. 20 AK)</option>
+                    <option value="30|Prosiding Internasional Terindeks Scopus/WoS">Prosiding Internasional Terindeks (Maks. 30 AK)</option>
+                    <option value="40|Paten / HKI Bersertifikat Internasional">Paten Bersertifikat (Maks. 40 AK)</option>
+                  </select>
+                </div>
+                <div class="pub-form-row">
+                  <div class="field">
+                    <label for="pPeran">Peran Penulis</label>
+                    <select id="pPeran">
+                      <option value="tunggal">Penulis Tunggal (100%)</option>
+                      <option value="utama_kor" selected>Pertama &amp; Korespondensi (60%)</option>
+                      <option value="utama">Penulis Pertama saja (40%)</option>
+                      <option value="anggota">Penulis Anggota (40% ÷ anggota)</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="pTotalPenulis">Total Penulis</label>
+                    <input type="number" id="pTotalPenulis" min="1" max="30" value="3" />
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="pTahun">Tahun Terbit</label>
+                  <input type="number" id="pTahun" min="2015" max="2035" value="2026" />
+                </div>
+                <button type="submit" class="btn btn-primary">+ Tambahkan ke Daftar</button>
+              </form>
+
+              <div class="pub-list-box">
+                <div class="pub-summary-bar">
+                  <div>
+                    <span class="result-kicker">Total Akumulasi Poin Penelitian</span>
+                    <div class="pub-total-num"><span id="pubTotalAk">0</span> <small>AK</small></div>
+                  </div>
+                  <div class="pub-summary-actions">
+                    <button type="button" class="btn btn-accent" id="btnApplyPubToCalc">Gunakan di Kalkulator →</button>
+                    <button type="button" class="btn btn-ghost btn-sm" id="btnClearPub">Reset Daftar</button>
+                  </div>
+                </div>
+
+                <div class="table-scroll">
+                  <table class="ak-table pub-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Judul &amp; Kategori Karya</th>
+                        <th scope="col">Peran</th>
+                        <th scope="col">Poin AK</th>
+                        <th scope="col">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody id="pubTableBody"></tbody>
+                  </table>
+                </div>
+                <p class="small-note">
+                  Rumus pembagian kepenulisan mengacu standar PAK: Tunggal 100%, Utama+Korespondensi 60%, Utama/Korespondensi 40%, Anggota 40% dibagi jumlah penulis pendamping.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel: VALIDATOR JURNAL -->
+          <div class="sub-block svc-panel" id="validator" role="tabpanel" aria-label="Validator jurnal" hidden>
+            <div class="validator-box card">
+              <div class="validator-head">
+                <span class="eyebrow-tag">VALIDATOR SYARAT KHUSUS</span>
+                <h3>Cek Kelayakan Jurnal Incaran</h3>
+                <p class="small-note">Masukkan indeksasi &amp; skor jurnal untuk melihat jenjang mana yang mengakui jurnal tersebut sebagai syarat khusus.</p>
+              </div>
+              <div class="validator-controls">
+                <div class="field">
+                  <label for="valIndex">Indeksasi / Akreditasi</label>
+                  <select id="valIndex">
+                    <option value="scopus-q1">Internasional Bereputasi — Q1</option>
+                    <option value="scopus-q2" selected>Internasional Bereputasi — Q2</option>
+                    <option value="scopus-q3">Internasional Bereputasi — Q3</option>
+                    <option value="scopus-q4">Internasional Bereputasi — Q4</option>
+                    <option value="sinta-1">Nasional Terakreditasi — SINTA 1</option>
+                    <option value="sinta-2">Nasional Terakreditasi — SINTA 2</option>
+                    <option value="sinta-3">Nasional Terakreditasi — SINTA 3 / 4</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="valSjr">Skor SJR (opsional, untuk Scopus)</label>
+                  <input type="number" id="valSjr" step="0.01" min="0" value="0.32" placeholder="Contoh: 0.25" />
+                </div>
+                <div class="field">
+                  <label for="valIf">Impact Factor / IF (opsional)</label>
+                  <input type="number" id="valIf" step="0.01" min="0" value="0.10" placeholder="Contoh: 0.05" />
+                </div>
+                <div class="field">
+                  <label for="valRole">Peran Anda di Artikel</label>
+                  <select id="valRole">
+                    <option value="first-corr">Penulis Pertama &amp; Korespondensi</option>
+                    <option value="first">Penulis Pertama saja</option>
+                    <option value="corr">Penulis Korespondensi saja</option>
+                    <option value="member">Penulis Anggota</option>
+                  </select>
+                </div>
+              </div>
+              <div class="validator-output" id="valOutput" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 5. ALUR ============ -->
+      <section class="section view" id="alur" aria-labelledby="alur-title" hidden>
+        <div class="container">
+          <header class="section-head">
+            <h2 id="alur-title">Alur pengusulan kenaikan jabatan</h2>
+            <p>Seluruh proses berjalan melalui SISTER, dari pelaporan kinerja sampai penetapan jabatan baru.</p>
+          </header>
+          <ol class="steps" id="steps"></ol>
+        </div>
+      </section>
+
+      <!-- ============ 6. LONCAT ============ -->
+      <section class="section view" id="loncat" aria-labelledby="loncat-title" hidden>
+        <div class="container">
+          <header class="section-head">
+            <h2 id="loncat-title">Loncat jabatan</h2>
+            <p>
+              Dosen dengan dedikasi dan prestasi luar biasa dapat naik dua jenjang sekaligus.
+              Syarat reguler jenjang tujuan tetap berlaku.
+            </p>
+          </header>
+
+          <div class="jump-grid" id="jumpGrid"></div>
+
+          <div class="jump-common card">
+            <h3>Berlaku untuk kedua jalur</h3>
+            <ul class="ticks" id="jumpCommon"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 7. KALENDER ============ -->
+      <section class="section view" id="kalender" aria-labelledby="kal-title" hidden>
+        <div class="container">
+          <header class="section-head">
+            <span class="eyebrow-tag" id="kalGreeting">AGENDA AKADEMIK DOSEN</span>
+            <h2 id="kal-title">Kalender Kegiatan, Libur &amp; Peringatan Nasional</h2>
+            <p>
+              Atur jadwal pengumpulan berkas BKD, tenggat publikasi, atau agenda uji kompetensi. Dilengkapi info peringatan &amp; hari libur nasional resmi pemerintah secara real-time.
+            </p>
+          </header>
+
+          <div class="kal-top">
+            <div class="clock-card" aria-live="off">
+              <div class="clock-live-row">
+                <span class="live-dot" aria-hidden="true"></span>
+                <span class="clock-badge">WAKTU SETEMPAT • REAL-TIME</span>
+              </div>
+              <div class="clock-time" id="liveClockTime">00:00:00</div>
+              <div class="clock-date" id="liveClockDate">Memuat tanggal...</div>
+            </div>
+
+            <div class="kal-stat s-blue">
+              <span class="kal-stat-num" id="kalStatMonth">0</span>
+              <span class="kal-stat-label">Agenda bulan ini</span>
+            </div>
+            <div class="kal-stat s-green">
+              <span class="kal-stat-num" id="kalStatWeek">0</span>
+              <span class="kal-stat-label">Agenda 7 hari ke depan</span>
+            </div>
+            <div class="kal-stat s-red">
+              <span class="kal-stat-num" id="kalStatHoliday">0</span>
+              <span class="kal-stat-label">Libur nasional bulan ini</span>
+            </div>
+          </div>
+
+          <div class="kal-today-banner" id="kalTodayBanner" aria-live="polite"></div>
+
+          <div class="kal-sync-bar">
+            <span class="kal-sync-label" id="liburSyncStatus">● Libur Nasional: Memuat data real-time…</span>
+            <div class="kal-sync-actions">
+              <button type="button" class="btn btn-ghost btn-sm" id="btnSyncLibur">Perbarui Real-Time</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="btnExportIcs">Ekspor ke Kalender HP / Google (.ics)</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="btnBackupKal">Simpan Backup (.json)</button>
+              <label class="btn btn-ghost btn-sm" for="inputRestoreKal">
+                Muat Backup (.json)
+                <input type="file" id="inputRestoreKal" accept=".json" hidden />
+              </label>
+            </div>
+          </div>
+
+          <div class="kal-export-bar">
+            <label class="switch" for="kalExportToggle">
+              <input type="checkbox" id="kalExportToggle" role="switch" checked />
+              <span class="switch-track" aria-hidden="true"><i></i></span>
+              <span class="switch-text">
+                <strong>Sertakan kalender di file PDF &amp; Word</strong>
+                <small id="kalExportStateText">ON: agenda kalender ikut tercetak di dokumen.</small>
+              </span>
+            </label>
+          </div>
+
+          <div class="kal-grid">
+            <div class="kal-board">
+              <div class="kal-banner">
+                <div class="kal-banner-text">
+                  <span class="kal-banner-year" id="kalYearLabel">2026</span>
+                  <h3 id="kalMonthLabel">Bulan</h3>
+                </div>
+                <div class="kal-nav-btns">
+                  <button type="button" class="icon-btn icon-btn-light" id="kalPrev" aria-label="Bulan sebelumnya">
+                    <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+                  </button>
+                  <button type="button" class="btn btn-light btn-sm" id="kalToday">Hari ini</button>
+                  <button type="button" class="icon-btn icon-btn-light" id="kalNext" aria-label="Bulan berikutnya">
+                    <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="kal-body">
+                <div class="kal-weekdays" aria-hidden="true">
+                  <span class="is-sun">Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span class="is-sat">Sab</span>
+                </div>
+                <div class="kal-days" id="kalDays" role="grid" aria-label="Tanggal kalender"></div>
+                <div class="kal-legend" id="kalLegend"></div>
+
+                <div class="kal-month-commem">
+                  <h4>Libur Nasional &amp; Hari Peringatan Bulan Ini</h4>
+                  <ul class="kal-commem-list" id="kalMonthCommemList"></ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="kal-side">
+              <aside class="kal-agenda card">
+                <p class="result-kicker">Detail &amp; agenda pada tanggal terpilih</p>
+                <h3 class="kal-selected-title" id="kalSelectedDateLabel">-</h3>
+                <div class="kal-holiday" id="kalHoliday" hidden></div>
+
+                <div class="quick-chips" aria-label="Isi cepat agenda">
+                  <button type="button" class="chip-btn" data-quick="Unggah Laporan BKD di SISTER|09:00|BKD / SKP">+ Tenggat BKD</button>
+                  <button type="button" class="chip-btn" data-quick="Submit Artikel Jurnal Syarat Khusus|13:00|Publikasi">+ Submit Jurnal</button>
+                  <button type="button" class="chip-btn" data-quick="Pelaksanaan Uji Kompetensi JAD|08:00|Uji Kompetensi">+ Uji Kompetensi</button>
+                </div>
+
+                <form class="kal-form" id="kalForm">
+                  <div class="field">
+                    <label for="kalEventTitle">Nama kegiatan / agenda</label>
+                    <input type="text" id="kalEventTitle" placeholder="Tulis kegiatan Anda..." required />
+                  </div>
+                  <div class="kal-form-row">
+                    <div class="field">
+                      <label for="kalEventTime">Waktu</label>
+                      <input type="time" id="kalEventTime" value="09:00" required />
+                    </div>
+                    <div class="field">
+                      <label for="kalEventCat">Kategori</label>
+                      <select id="kalEventCat"></select>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Simpan Kegiatan</button>
+                </form>
+
+                <div class="kal-events-wrap">
+                  <h4>Daftar kegiatan</h4>
+                  <ul class="kal-event-list" id="kalEventList"></ul>
+                </div>
+              </aside>
+
+              <aside class="kal-upcoming card">
+                <h4>Agenda mendatang</h4>
+                <ul class="kal-up-list" id="kalUpcoming"></ul>
+              </aside>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 8. FAQ ============ -->
+      <section class="section view" id="faq" aria-labelledby="faq-title" hidden>
+        <div class="container faq-wrap">
+          <header class="section-head">
+            <h2 id="faq-title">Pertanyaan yang sering diajukan</h2>
+            <div class="search">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>
+              <label class="sr-only" for="faqSearch">Cari pertanyaan</label>
+              <input type="search" id="faqSearch" placeholder="Cari, misalnya: proporsi" autocomplete="off" />
+            </div>
+          </header>
+          <div class="faq-list" id="faqList"></div>
+          <p class="faq-empty" id="faqEmpty" hidden>
+            Tidak ada pertanyaan yang cocok. Coba kata lain, misalnya “publikasi” atau “Profesor”.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- ============ LAYANAN BANTUAN ============ -->
+    <section class="cs-section" id="bantuan" aria-labelledby="cs-title">
+      <div class="container">
+        <header class="section-head">
+          <span class="eyebrow-tag">LAYANAN PENGGUNA</span>
+          <h2 id="cs-title">Customer Service &amp; Lapor Kendala</h2>
+          <p>Menemukan error, hasil hitung yang janggal, atau punya saran? Kirim laporan di sini. Laporan masuk otomatis ke email pengelola portal.</p>
+        </header>
+
+        <div class="cs-grid">
+          <div class="cs-info">
+            <div class="cs-info-card">
+              <span class="cs-ico">1</span>
+              <div><strong>Isi formulir</strong><p>Jelaskan kendala dan halaman tempat terjadinya.</p></div>
+            </div>
+            <div class="cs-info-card">
+              <span class="cs-ico">2</span>
+              <div><strong>Terkirim ke email</strong><p>Laporan beserta data perangkat dan log kesalahan dikirim otomatis.</p></div>
+            </div>
+            <div class="cs-info-card">
+              <span class="cs-ico">3</span>
+              <div><strong>Nomor tiket</strong><p>Simpan nomor tiket untuk menanyakan perkembangan laporan.</p></div>
+            </div>
+          </div>
+
+          <form class="cs-form card" id="csForm" novalidate>
+            <div class="cs-row">
+              <div class="field">
+                <label for="csNama">Nama</label>
+                <input type="text" id="csNama" placeholder="Nama lengkap" required />
+              </div>
+              <div class="field">
+                <label for="csEmail">Email Anda (untuk balasan)</label>
+                <input type="email" id="csEmail" placeholder="nama@email.com" required />
+              </div>
+            </div>
+            <div class="cs-row">
+              <div class="field">
+                <label for="csJenis">Jenis laporan</label>
+                <select id="csJenis"></select>
+              </div>
+              <div class="field">
+                <label for="csHalaman">Halaman terkait</label>
+                <select id="csHalaman"></select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="csPesan">Uraian kendala</label>
+              <textarea id="csPesan" rows="5" placeholder="Ceritakan apa yang terjadi, langkah yang dilakukan, dan hasil yang diharapkan…" required></textarea>
+            </div>
+            <input type="text" id="csHoney" class="sr-only" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <p class="cs-status" id="csStatus" role="status" hidden></p>
+            <div class="cs-actions">
+            
+              <button type="button" class="btn btn-ghost" id="csMailto">Kirim lewat aplikasi email</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="container footer-compact">
+        <strong>JAD — Portal Perencanaan Jabatan Akademik Dosen • Universitas Pancasakti Tegal</strong>
+        <span>Acuan: Permendiktisaintek 52/2025 &amp; Kemendiktisaintek 39/M/KEP/2026</span>
+        <p class="footer-note">Data diperbarui <span id="updated"></span>. Alat bantu perencanaan mandiri; keputusan resmi tetap pada Tim PAK perguruan tinggi.</p>
+      </div>
+    </footer>
+  </div>
+
+  <div id="printDossier" class="print-dossier" aria-hidden="true"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="assets/js/data.js?v=4"></script>
+  <script src="assets/js/main.js?v=4"></script>
+</body>
+</html>
